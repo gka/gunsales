@@ -2,7 +2,7 @@
 # if you don't have `needs` get it using
 # install.packages('needs')
 # library(needs)
-needs(seasonal, ggplot2, data.table, zoo, x13binary, stringr, readr)
+needs(seasonal, ggplot2, data.table, zoo, x13binary, stringr)
 
 source('src/functions.R')
 source('src/plot.R')
@@ -37,11 +37,11 @@ totalSeasScaled <- totalSeas / 280726
 ## create a new data frame that eventually stores all the
 ## data we need in the final piece
 out_data <- ts_to_dataframe(total, 'guns_total') %>% 
-    mutate(guns_total=round(guns_total, 3))
+    mutate(guns_total=round(guns_total, 0))
 
 ## expand the data.frame, adding more volumns
 out_data <- data.frame(out_data,
-                       guns_total_seas=as.matrix(totalSeas),
+                       guns_total_seas=round(as.matrix(totalSeas),0),
                        guns_total_per_1000=round(as.matrix(totalSeasPop), digits=3),
                        guns_total_per_1000_scaled=round(as.matrix(totalSeasScaled), digits=3))
 if (debug) {
@@ -103,6 +103,7 @@ missouri.avg_pre_2007 <- mean(missouri[73:84])
 missouri.avg_post_2008 <- mean(missouri[97:108])
 print(paste('Increase in monthly gun sales in Missouri =', round(missouri.avg_post_2008 - missouri.avg_pre_2007, digits=2)))
 
-out_data %>% select(year,month,guns_total,guns_total_seas,handgun_share,longgun_share,new_jersey,maryland,georgia,louisiana,mississippi,missouri,dc_handguns_per_100k_national_sales) %>% write_csv('out/all-data.csv')
+out_data %>% select(year,month,guns_total,guns_total_seas,handgun_share,longgun_share,new_jersey,maryland,georgia,louisiana,mississippi,missouri,dc_handguns_per_100k_national_sales) %>%
+    write.csv('out/all-data.csv', row.names=F)
 
 out_data %>% plot_gunsales(savePlots=T)
