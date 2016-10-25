@@ -4,7 +4,8 @@
 # library(needs)
 needs(seasonal, ggplot2, data.table, zoo, x13binary, stringr, readr)
 
-source('functions.R')
+source('src/functions.R')
+source('src/plot.R')
 
 debug <- TRUE
 
@@ -103,3 +104,5 @@ missouri.avg_post_2008 <- mean(missouri[97:108])
 print(paste('Increase in monthly gun sales in Missouri =', round(missouri.avg_post_2008 - missouri.avg_pre_2007, digits=2)))
 
 out_data %>% select(year,month,guns_total,guns_total_seas,handgun_share,longgun_share,new_jersey,maryland,georgia,louisiana,mississippi,missouri,dc_handguns_per_100k_national_sales) %>% write_csv('out/all-data.csv')
+
+out_data %>% plot_gunsales(savePlots=T)
