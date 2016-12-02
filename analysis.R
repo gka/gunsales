@@ -2,7 +2,7 @@
 # if you don't have `needs` get it using
 # install.packages('needs')
 # library(needs)
-needs(seasonal, ggplot2, data.table, zoo, x13binary, stringr)
+needs(seasonal, ggplot2, data.table, zoo, x13binary, stringr, dplyr)
 
 source('src/functions.R')
 source('src/plot.R')
@@ -10,8 +10,7 @@ source('src/plot.R')
 debug <- TRUE
 
 # load data
-alldata <- read.csv("src/ncis_bystate_bymonth_bytype.csv", na = "#N/A", stringsAsFactors=FALSE)
-poptotal <- read.csv("src/population.csv", stringsAsFactors=FALSE)
+alldata <- read.csv("data/ncis_bystate_bymonth_bytype.csv", na = "#N/A", stringsAsFactors=FALSE)
 
 ## estimate gun sales using formula by Jurgen Brauer, published here
 ## http://www.smallarmssurvey.org/fileadmin/docs/F-Working-papers/SAS-WP14-US-Firearms-Industry.pdf
@@ -26,24 +25,14 @@ total <- alldata %>% state_ts('Totals', 'guns_sold')
 ## compute seasonally adjusted gun sales (using final() and seas() from seasonal)
 totalSeas <- total %>% seas %>% final
 
-poptotal <- poptotal %>%
-    filter(year >= 2000) %>%
-    with(ts(res_pop, start=c(2000,1), frequency = 12))
-
-## normalize gun sales by population
-totalSeasPop <- totalSeas / poptotal * 1000
-totalSeasScaled <- totalSeas / 280726
-
 ## create a new data frame that eventually stores all the
 ## data we need in the final piece
 out_data <- ts_to_dataframe(total, 'guns_total') %>% 
     mutate(guns_total=round(guns_total, 0))
 
 ## expand the data.frame, adding more volumns
-out_data <- data.frame(out_data,
-                       guns_total_seas=round(as.matrix(totalSeas),0),
-                       guns_total_per_1000=round(as.matrix(totalSeasPop), digits=3),
-                       guns_total_per_1000_scaled=round(as.matrix(totalSeasScaled), digits=3))
+out_data <- data.frame(out_data, guns_total_seas=round(as.matrix(totalSeas),0))
+
 if (debug) {
     print(head(out_data))
     print(tail(out_data))

@@ -37,12 +37,6 @@ plot_gunsales <- function(df, savePlots=FALSE) {
     plot(df2ts(df, "guns_total_seas")/1e6, main="Total estimated gun sales",
          ylab="in million", xlab="seasonal adjused")
 
-    ## plot gun sales normalized to population
-    plot(df2ts(df, "guns_total_per_1000_scaled"), main="Estimated gun sales per 1000",
-         xlab="red = adjusted for population growth", ylab="")
-    ## and add the not normalized version for comparison
-    lines(df2ts(df, "guns_total_per_1000"), col="red")
-
     ## plot handgun/longgun 
     plot(df2ts(df, "longgun_share"), col="blue",
          ylim=c(0.2,0.8), main="Long guns vs handguns",
